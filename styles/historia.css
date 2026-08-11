@@ -1,0 +1,339 @@
+:root { 
+    /* Azul Profundo (Primária): Para Cabeçalhos, Navbar e Textos de destaque */
+    --cor-primaria: #10316b; 
+    /* Laranja Vibrante (Destaque/CTA): Para Botões e Ícones importantes */
+    --cor-destaque: #f58800; 
+    --cor-destaque-hover: #e07b00; /* Laranja um pouco mais escuro para quando passar o mouse */
+    /* Neutros (Fundos e Textos) */
+    --cor-fundo-site: #d1deeb; /* Um branco levemente azulado (não cansa a vista) */
+    --cor-fundo-cartao: #ffffff; /* Branco puro para caixas e áreas de conteúdo */
+    --cor-texto-principal: #333333; /* Cinza escuro (melhor que preto puro) */
+    --cor-texto-suave: #666666; /* Para parágrafos ou textos menos importantes */
+    /* Montserrat é moderna e forte para títulos */
+    --fonte-titulo: 'Montserrat', sans-serif;
+    /* Open Sans é excelente para leitura longa */
+    --fonte-corpo: 'Open Sans', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--cor-fundo-site);
+    color: var(--cor-texto-principal);
+    font-family: var(--fonte-corpo);
+    line-height: 1.6;
+}
+
+.container_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--cor-primaria);
+    padding: 0 clamp(60px, 8vw, 100px);
+    min-height: 100px;
+}
+
+.container_logo {
+    width: 150px; 
+    display: flex;
+    justify-content: flex-start;
+}
+
+.container_logo img {
+    width: 90px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.container_logo:hover {
+    transform: scale(1.1);
+}
+
+.container_nav-bar {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.container_nav-bar ul {
+    display: flex;
+    align-items: center;
+    gap: 2.5em;
+    list-style: none;
+}
+
+.container_menu a {
+    text-decoration: none;
+    color: var(--cor-fundo-cartao);
+    font-size: var(--fonte-titulo);
+    font-weight: 600;
+    font-size: 1.1rem;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.container_menu a::after {
+    content: '';
+    position: absolute;
+    width: 0%;                      
+    height: 3px;   
+    bottom: -5px;                   
+    left: 0;
+    background-color: var(--cor-destaque); 
+    transition: width 0.3s ease;    
+}
+
+.container_menu a:hover {
+    color: var(--cor-destaque);
+}
+
+.container_menu a:hover::after {
+    width: 100%;
+}
+
+.icons{
+    width: 150px; 
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    gap: 3.5em;
+}
+
+.icons img {
+    width: 28px;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    filter: invert(100%) brightness(200%);
+}
+
+.icons img:hover {
+    transform: scale(1.15);
+}
+
+.carrinho-botaozinho {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carrinho-botaozinho a {
+    display: flex;
+    align-items: center;
+}
+
+.container_inicio {
+    background: url("/imgs/img_loja01.jpeg") no-repeat center center / cover;
+    height: 85vh;
+    width: 98%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    border-radius: 20px;
+    border: 1px solid var(--cor-fundo-cartao);
+    box-shadow: 0px 10px 30px rgba(0,0,0, 0.3);
+    z-index: 1;
+    position: relative;
+}
+.container_inicio::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); 
+    z-index: -1; 
+    border-radius: 20px;
+}
+
+.container_section{
+    display: flex;
+    align-items: center;
+}
+
+.container_footer {
+    display: flex;
+    color: var(--cor-fundo-cartao);
+    flex-direction: column;
+    align-items: center;
+    font-weight: 400;
+    gap: 15px;
+    background-color: var(--cor-primaria);
+    padding: 0 clamp(60px, 8vw, 100px);
+    padding-top: 15px;
+    padding-bottom: 15px;
+    min-height: 100px;
+}
+
+.container_footer a {
+    text-decoration: none;
+    color: var(--cor-fundo-cartao);
+    transition: color 0.3s ease;
+}
+
+.container_span {
+    color: var(--cor-destaque);
+    font-weight: 800;
+}
+
+.container_footer a:hover {
+    color: var(--cor-destaque);
+    cursor: pointer; 
+}
+
+
+/* MENU HAMBURGUER*/
+
+.menu-hamburguer {
+    display: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.linha {
+    width: 30px;
+    height: 3px;
+    background-color: white;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+/*MEDIA QUERY PARA MOBILE (CELULARES) */
+@media (max-width: 768px) {
+    .menu-hamburguer {
+        display: flex;
+        z-index: 1001;
+    }
+
+    .container_nav-bar {
+        position: absolute;
+        top: 100px;
+        right: 0;
+        width: 100%;
+        height: 0;
+        background-color: var(--cor-primaria);
+        overflow: hidden;
+        transition: height 0.5s ease;
+        z-index: 1000;
+        box-shadow: 0 10px 10px rgba(0,0,0,0.2);
+    }
+
+    .container_nav-bar.ativo {
+        height: 250px;
+    }
+
+    .container_nav-bar ul {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        gap: 20px;
+        opacity: 0;
+        transition: opacity 0.3s ease 0.2s;
+    }
+
+    .container_nav-bar.ativo ul {
+        opacity: 1;
+    }
+
+    .icons {
+        gap: 15px;
+    }
+    
+    .menu-hamburguer.ativo .linha:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+    }
+    .menu-hamburguer.ativo .linha:nth-child(2) {
+        opacity: 0;
+    }
+    .menu-hamburguer.ativo .linha:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+    }
+    
+    .container_header {padding: 0 20px;}
+    .container_logo img {width: 70px;}
+    .container_inicio { height: auto; padding: 40px 10px; }
+    .container_texto h1 { font-size: 2rem; }
+    .carrossel-trilho img { height: 300px; }
+    .container_div_produtos img { width: 46%; }
+    .container_mapa iframe { height: 300px; }
+
+    .container_footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
+    }
+
+    .container_footer a:hover {
+        padding-left: 0;
+    }
+
+}
+
+#contagem-carrinho {
+    position: absolute;
+    top: -5px;          
+    right: -5px;        
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+    display: flex;      
+    justify-content: center;
+    align-items: center;
+    border: 2px solid white; 
+}
+
+.caixa-pesquisa {
+  position:absolute;
+  top: 100px;
+  left: 0;
+  width: 100%;
+  background-color: var(--cor-fundo-site, #ffffff);
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  transform: translateY(-20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease-in-out;
+  z-index: 999999 !important;
+}
+
+#input-pesquisa {
+    width: 60%;
+    max-width: 600px;
+    padding: 12px 20px;
+    border: 2px solid var(--cor-primaria, #ccc);
+    border-radius: 30px;
+    font-size: 1rem;
+    outline: none;
+}
+
+#btn-fechar-pesquisa {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: red;
+    cursor: pointer;
+}
+
+.caixa-pesquisa.ativa {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
