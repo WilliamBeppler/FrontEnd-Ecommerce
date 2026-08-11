@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos</title>
+    <link rel="stylesheet" href="../styles/loja.css">
+</head>
+<body>
+ <header class="container_header">
+        <div class="container_logo">
+            <img src="../imgs/img_logo.png">
+        </div>
+
+        <div class="menu-hamburguer">
+            <div class="linha"></div>
+            <div class="linha"></div>
+            <div class="linha"></div>
+        </div> 
+
+        <nav class="container_nav-bar">
+            <ul class="container_menu">
+                <li><a href="../index.html">Início</a></li>
+                <li><a href="loja.html">Produtos</a></li>
+                <li><a href="#">Cardápio</a></li>
+                <li><a href="historia.html">Nossa História</a></li>
+            </ul>
+        </nav>
+
+        <div class="icons">
+            <img src="../imgs/img_pesquisa.svg" alt="pesquisa" id="icone-pesquisa">
+            
+            <div class="carrinho-botaozinho" style="position: relative;">
+                <a href="pagina-carrinho.html"> <img src="../imgs/img_carrinho.png"></a>
+                <span id="contagem-carrinho">0</span>
+            </div>
+        </div>
+
+     <div class="caixa-pesquisa" id="caixa-pesquisa">
+        <input type="text" id="input-pesquisa" placeholder="O que você está procurando?">
+        <button id="btn-fechar-pesquisa">X</button>
+     </div>
+     
+    </header>
+
+    <section class="container_section_Loja">
+        <div class="container_div_titulo">
+          <h2>Nossos Produtos</h2>
+        </div>
+        
+        <div class="container_loja"></div>
+        
+    </section>
+
+ <footer class="container_footer">
+    <p><span class="container_span">A MELHOR </span>casa de produtos colôniais do Brasil!</p>
+    <p>Da nossa roça direto pra <span class="container_span"> SUA MESA!</span></p>
+    <p><a href="termos.html">Termos de uso</a> e <a href="privacidade.html">política de privacidade</a> - <a>Política de Cookies.</a></p>
+ </footer>
+
+<div id="notificacao-sucesso" class="toast-escondido">
+        ✅ Produto adicionado ao carrinho!
+</div>
+
+<script src="../js/main.js"></script>
+<script src="../js/carrinho.js"></script>
+
+</body>
+</html>
