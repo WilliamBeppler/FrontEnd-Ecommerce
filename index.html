@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedacinho do Céu Produtos Coloniais</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <header class="container_header">
+        <div class="container_logo">
+            <img src="./imgs/img_logo.png">
+        </div>
+
+        <div class="menu-hamburguer">
+            <div class="linha"></div>
+            <div class="linha"></div>
+            <div class="linha"></div>
+        </div> 
+
+        <nav class="container_nav-bar">
+            <ul class="container_menu">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="./pages/loja.html">Produtos</a></li>
+                <li><a href="#">Cardápio</a></li>
+                <li><a href="./pages/historia.html">Nossa História</a></li>
+            </ul>
+        </nav>
+
+        <div class="icons">
+            <img src="./imgs/img_pesquisa.svg" alt="pesquisa" id="icone-pesquisa">
+            
+            <div class="carrinho-botaozinho" style="position: relative;">
+                <a href="./pages/pagina-carrinho.html"> <img src="./imgs/img_carrinho.png"></a>
+                <span id="contagem-carrinho">0</span>
+            </div>
+        </div>
+
+     <div class="caixa-pesquisa" id="caixa-pesquisa">
+        <input type="text" id="input-pesquisa" placeholder="O que você está procurando?">
+        <button id="btn-fechar-pesquisa">X</button>
+     </div>
+
+    </header>
+
+    <div class="container_inicio">
+        <section class="container_section">
+            <div class="container_texto">
+                <h1>Trazendo o Melhor da roça para você e sua família</h1>
+                <p>Resgatando memórias afetivas!</p>
+                <a href="./pages/loja.html" class="btn">Experimente Agora!</a>
+            </div>
+        </section>
+    </div>
+
+    <section class="container_section_espaco">
+
+         <div class="container_div_titulo">
+            <h2>Um pequeno gostinho da nossa loja</h2>
+         </div>
+
+         <div class="carossel-janela">
+            <div class="carrossel-trilho" id="trilho">
+                <img src="./imgs/espaco_loja1.jpeg">
+                <img src="./imgs/img_loja01.jpeg">
+                <img src="./imgs/img_loja02.jpeg">
+                <img src="./imgs/img_loja03.jpeg">
+                <img src="./imgs/img_loja04.jpeg">
+                <img src="./imgs/img_loja05.jpeg">
+            </div>
+         </div>
+    </section>
+
+
+
+    <section class="container_section_produtos">
+        <div class="container_div_subtitulo">
+         <h2>Principais Produtos</h2>
+        </div>   
+        
+        <div class="container_div_produtos">
+             <img src="./imgs/img_produto2.jpeg">
+             <img src="./imgs/img_produto3.jpeg">
+             <img src="./imgs/img_produto4.jpeg">
+             <img src="./imgs/img_produto5.jpeg">
+             <img src="./imgs/img_produto6.jpeg">
+             <img src="./imgs/img_produto7.jpeg">
+        </div>
+    </section>
+
+    <section class="container_endereco">
+        <h2 class="container_titulo">Nosso Endereço</h2> 
+        <div class="container_mapa">
+           <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.9042339713037!2d-48.7310496!3d-27.689354599999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9520cb670e651e77%3A0xafcf1985e7125c56!2sPedacinho%20do%20c%C3%A9u%20produtos%20coloniais!5e0!3m2!1spt-BR!2sbr!4v1769728997402!5m2!1spt-BR!2sbr" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></iframe>
+        </div>
+    </section>
+
+ 
+
+<footer class="container_footer">
+    <p><span class="container_span">A MELHOR </span>casa de produtos colôniais do Brasil!</p>
+    <p>Da nossa roça direto pra <span class="container_span"> SUA MESA!</span></p>
+    <p><a href="./pages/termos.html">Termos de uso</a> e <a href="./pages/privacidade.html">política de privacidade</a> - <a>Política de Cookies.</a></p>
+</footer>
+
+<script src="./js/main.js"></script>
+<script src="./js/carrinho.js"></script>
+
+</body>
+</html>
