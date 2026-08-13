@@ -1,11 +1,11 @@
-function adicionarAoCarrinho(nome, preco, imagem) {
+function adicionarAoCarrinho(id, nome, preco, imagem) {
     const carrinho = JSON.parse(localStorage.getItem('meuCarrinho')) || [];
 
     const novoProduto = {
+        id: id,
         nome: nome,
         preco: preco,
         imagem: imagem,
-        id: Date.now()
     };
 
     dispararPopUp();

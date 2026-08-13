@@ -125,7 +125,7 @@ async function carregarEstoque() {
                     <img src="${produto.caminho_imagem}" alt="${produto.nome}">
                     <h3>${produto.nome}</h3>
                     <div class="preco">${precoFormatado}<span>R$ ${precoAntigo}</span></div>
-                    <button class="btn" onclick="adicionarAoCarrinho('${produto.nome}', ${produto.preco}, '${produto.caminho_imagem}')">Adicionar ao Carrinho</button>
+                    <button class="btn" onclick="adicionarAoCarrinho(${produto.id}, '${produto.nome}', ${produto.preco}, '${produto.caminho_imagem}')">Adicionar ao Carrinho</button>
                  </div>
             `;
         });

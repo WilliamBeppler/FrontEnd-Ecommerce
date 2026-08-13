@@ -41,9 +41,13 @@ async function cadastrarUsuario(event) {
         });
 
         if (resposta.ok) {
+            const usuarioCriado = await resposta.json();
+
             alert("✅ Cadastro realizado com sucesso!");
             localStorage.setItem('usuarioLogado', 'true');
             localStorage.setItem('emailUsuario', novoUsuario.email);
+
+            localStorage.setItem('idUsuarioLogado', usuarioCriado.id);
             window.location.href = 'checkout.html';
         } else {
             const erro = await resposta.text();
@@ -93,9 +97,13 @@ async function fazerLogin(event) {
         });
 
         if (resposta.ok) {
-            alert("✅ Login aprovado!"); 
+            const usuarioResponse = await resposta.json();
+
+            alert("✅ Login aprovado! Bem-vindo(a), " + usuarioResponse.nome + "!"); 
             localStorage.setItem('usuarioLogado', 'true');
             localStorage.setItem('emailUsuario', dadosLogin.email);
+
+            localStorage.setItem('idUsuarioLogado', usuarioResponse.id);
             window.location.href = 'checkout.html';
         } else {
             const erro = await resposta.text();

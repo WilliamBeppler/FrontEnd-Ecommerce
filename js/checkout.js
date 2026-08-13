@@ -57,3 +57,106 @@ radiosPagamento.forEach(radio => {
         }
     });
 });
+
+// OUVINTE DO BOTÃO DE FINALIZAR COMPRA
+const btnFinalizar = document.getElementById('btn-finalizar-compra');
+
+if (btnFinalizar) {
+    btnFinalizar.addEventListener('click', (event) => {
+        event.preventDefault(); // Impede o recarregamento automático da página
+        finalizarPedido();
+    });
+}
+
+function finalizarPedido() {
+    // 1. Resgata o carrinho do localStorage
+    const carrinho = JSON.parse(localStorage.getItem('meuCarrinho')) || [];
+
+    if (carrinho.length === 0) {
+        alert('Seu carrinho está vazio!');
+        return;
+    }
+
+    // 2. Captura a forma de pagamento selecionada
+    const radioPagamento = document.querySelector('input[name="pagamento"]:checked');
+    if (!radioPagamento) {
+        alert('Por favor, selecione uma forma de pagamento.');
+        return;
+    }
+
+    const usuarioLogadoId = localStorage.getItem('idUsuarioLogado');
+    
+    // Se a variável estiver vazia (null), o usuário não fez login!
+    if(!usuarioLogadoId) {
+        alert('Você precisa fazer login para finalizar a sua compra!');
+        const modalLogin = document.querySelector('.modal-auth'); 
+        if (modalLogin) {
+            modalLogin.style.display = 'flex';
+        }
+        
+        return; // Para a execução do pedido aqui e não envia para o Java
+    }
+
+    // 3. Monta o Objeto (JSON) com a mesma estrutura que o Spring Boot espera
+    const pedidoPayload = {
+        usuario: {
+            id: parseInt(usuarioLogadoId) 
+        },
+        clienteNome: document.getElementById('nome')?.value || 'Cliente Não Informado',
+        cpf: document.getElementById('cpf')?.value || '',
+        
+        endereco: {
+            cep: document.getElementById('cep')?.value || '',
+            rua: document.getElementById('rua')?.value || '',
+            numero: document.getElementById('numero')?.value || '',
+            bairro: document.getElementById('bairro')?.value || '',
+            cidade: document.getElementById('cidade')?.value || '',
+            estado: document.getElementById('estado')?.value || 'SC',
+            usuario: {
+                id: parseInt(usuarioLogadoId) 
+            }
+        },
+
+        metodoPagamento: radioPagamento.value,
+        
+        // Mapeia os itens do carrinho para a estrutura DTO do Back-End
+        itens: carrinho.map(item => ({
+            produto: {
+                id: item.id
+            },
+            quantidade: item.quantidade || 1,
+            precoUnitario: item.preco
+        }))
+    };
+
+    console.log("PACOTE QUE ESTÁ INDO PARA O JAVA:", pedidoPayload);
+
+    // 4. Dispara a requisição HTTP POST para a API Java
+    fetch('http://localhost:8080/api/pedidos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pedidoPayload)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Falha ao processar o pedido no servidor.');
+        }
+        return response.json();
+    })
+    .then(pedidoSalvo => {
+        // 5. Sucesso!
+        alert(`Pedido #${pedidoSalvo.id || ''} realizado com sucesso! Obrigado pela compra.`);
+        
+        // Limpa o carrinho no navegador após finalizar
+        localStorage.removeItem('meuCarrinho');
+        
+        // Redireciona para a página principal ou de confirmação
+        window.location.href = 'loja.html';
+    })
+    .catch(erro => {
+        console.error('Erro na requisição:', erro);
+        alert('Ocorreu um erro ao enviar seu pedido. Certifique-se de que a aplicação Back-End está rodando.');
+    });
+}
