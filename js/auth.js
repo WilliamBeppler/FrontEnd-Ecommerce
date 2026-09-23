@@ -92,7 +92,8 @@ async function fazerLogin(event) {
     try {
         const resposta = await fetch('http://localhost:8080/api/usuarios/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { "Content-Type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem('token')  },
             body: JSON.stringify(dadosLogin)
         });
 
@@ -100,10 +101,9 @@ async function fazerLogin(event) {
             const usuarioResponse = await resposta.json();
 
             alert("✅ Login aprovado! Bem-vindo(a), " + usuarioResponse.nome + "!"); 
-            localStorage.setItem('usuarioLogado', 'true');
-            localStorage.setItem('emailUsuario', dadosLogin.email);
-
-            localStorage.setItem('idUsuarioLogado', usuarioResponse.id);
+            localStorage.setItem('token', usuarioResponse.token);
+            localStorage.setItem('nome', usuarioResponse.nome);
+            localStorage.setItem('role', usuarioResponse.role);
             window.location.href = 'checkout.html';
         } else {
             const erro = await resposta.text();
