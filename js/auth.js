@@ -116,7 +116,6 @@ async function fazerLogin(event) {
 
 // --- SESSÃO: O SERVIDOR É A ÚNICA FONTE DA VERDADE ---
 // O token vive num cookie HttpOnly: este JavaScript não consegue lê-lo, de propósito.
-// Para saber se há alguém logado, a única forma é perguntar ao servidor (/me).
 
 /**
  * Única fonte da verdade sobre "estou logado?" em todo o site.

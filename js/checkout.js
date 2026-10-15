@@ -108,9 +108,6 @@ async function finalizarPedido() {
     if (!await estaLogado()) {
         alert('Você precisa fazer login para finalizar a sua compra!');
 
-        // CORREÇÃO: o modal é #modal-auth (id), e o código antigo procurava
-        // por .modal-auth (classe) — nunca achava nada, então o usuário só
-        // via o alerta e ficava travado sem caminho pro login.
         const modalLogin = document.getElementById('modal-auth');
         if (modalLogin) {
             modalLogin.style.display = 'flex';

@@ -186,7 +186,7 @@ const modalAuth = document.getElementById('modal-auth');
 const btnFecharModal = document.getElementById('btn-fechar-modal');
 
 async function avancarParaCheckout() {
-    // Pergunta ao servidor (/me): a sessão vive num cookie que o JS não enxerga
+    // Pergunta ao servidor: a sessão vive num cookie que o JS não enxerga
     if (await estaLogado()) {
         window.location.href = 'checkout.html';
     } else if (modalAuth) {
