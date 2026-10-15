@@ -1,3 +1,5 @@
+const API_USUARIOS = 'http://localhost:8080/api/usuarios';
+
 // --- LÓGICA DE CADASTRO ---
 async function cadastrarUsuario(event) {
     event.preventDefault(); // Impede a página de recarregar
@@ -34,20 +36,19 @@ async function cadastrarUsuario(event) {
     };
 
     try {
-        const resposta = await fetch('http://localhost:8080/api/usuarios/registrar', {
+        const resposta = await fetch(`${API_USUARIOS}/registrar`, {
             method: 'POST',
+            credentials: 'include', // deixa o navegador guardar o cookie do token
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(novoUsuario)
         });
 
         if (resposta.ok) {
-            const usuarioCriado = await resposta.json();
-
-            // Salva a sessão pelo MESMO caminho que o login usa
-            if (!salvarSessao(usuarioCriado, novoUsuario.email)) return;
+            // Confere a sessão pelo MESMO caminho que o login usa
+            if (!await confirmarSessao()) return;
 
             alert("✅ Cadastro realizado com sucesso!");
-            window.location.href = 'checkout.html';
+            window.location.href = destinoAposLogin();
         } else {
             const erro = await resposta.text();
             alert("❌ Erro no cadastro: " + erro);
@@ -90,21 +91,19 @@ async function fazerLogin(event) {
 
     try {
       
-        const resposta = await fetch('http://localhost:8080/api/usuarios/login', {
+        const resposta = await fetch(`${API_USUARIOS}/login`, {
             method: 'POST',
+            credentials: 'include', // deixa o navegador guardar o cookie do token
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dadosLogin)
         });
 
         if (resposta.ok) {
-            const usuarioResponse = await resposta.json();
+            const usuario = await confirmarSessao();
+            if (!usuario) return;
 
-            // CORREÇÃO PRINCIPAL: salva TODAS as chaves da sessão, incluindo o id.
-            // Antes só token/nome/role eram salvos, e o checkout lê 'idUsuarioLogado'.
-            if (!salvarSessao(usuarioResponse, dadosLogin.email)) return;
-
-            alert("✅ Login aprovado! Bem-vindo(a), " + usuarioResponse.nome + "!");
-            window.location.href = 'checkout.html';
+            alert("✅ Login aprovado! Bem-vindo(a), " + usuario.nome + "!");
+            window.location.href = destinoAposLogin();
         } else {
             const erro = await resposta.text();
             alert("❌ Erro no login: " + erro);
@@ -115,71 +114,112 @@ async function fazerLogin(event) {
     }
 }
 
-// --- SESSÃO: UM ÚNICO LUGAR QUE GRAVA, UM ÚNICO LUGAR QUE LÊ ---
-
-function salvarSessao(usuario, emailDigitado) {
-    if (!usuario || usuario.id === undefined || usuario.id === null) {
-        console.error(
-            "A resposta do back-end não trouxe o campo 'id'. Resposta recebida:",
-            usuario
-        );
-        alert(
-            "Erro interno: o servidor não retornou o identificador do usuário. " +
-            "Verifique o DTO de resposta no back-end."
-        );
-        return false;
-    }
-
-    localStorage.setItem('idUsuarioLogado', usuario.id);
-    localStorage.setItem('nome', usuario.nome || '');
-    localStorage.setItem('emailUsuario', usuario.email || emailDigitado || '');
-
-    if (usuario.token) localStorage.setItem('token', usuario.token);
-    if (usuario.role) localStorage.setItem('role', usuario.role);
-
-    return true;
-}
+// --- SESSÃO: O SERVIDOR É A ÚNICA FONTE DA VERDADE ---
+// O token vive num cookie HttpOnly: este JavaScript não consegue lê-lo, de propósito.
+// Para saber se há alguém logado, a única forma é perguntar ao servidor (/me).
 
 /**
  * Única fonte da verdade sobre "estou logado?" em todo o site.
+ * Devolve { id, nome, email, role } ou null (sem login, token vencido ou API fora do ar).
  */
-function estaLogado() {
-    const id = localStorage.getItem('idUsuarioLogado');
-    const token = localStorage.getItem('token');
-
-    if (!id || id === 'undefined' || id === 'null') return false;
-    if (!token) return false;
-    if (tokenExpirado(token)) {
-        console.warn('Token expirado, limpando a sessão.');
-        limparSessao();
-        return false;
-    }
-    return true;
-}
-
-/** Lê o campo 'exp' de dentro do JWT sem precisar chamar o servidor. */
-function tokenExpirado(token) {
+async function estaLogado() {
     try {
-        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        const payload = JSON.parse(atob(base64));
-        if (!payload.exp) return false;
-        return payload.exp * 1000 <= Date.now();
-    } catch (e) {
-        return true; // token malformado conta como inválido
+        const resposta = await fetch(`${API_USUARIOS}/me`, { credentials: 'include' });
+        if (!resposta.ok) return null; // 401 = sem cookie, ou token inválido/vencido
+        return await resposta.json();
+    } catch (erro) {
+        console.error('Não foi possível consultar a sessão no servidor:', erro);
+        return null;
     }
 }
 
+/**
+ * Depois do login/cadastro, confirma que o navegador realmente guardou o cookie.
+ * Sem isso, um cookie recusado pelo navegador pareceria "login aprovado" e
+ * a pessoa cairia deslogada na página seguinte, sem explicação.
+ */
+async function confirmarSessao() {
+    const usuario = await estaLogado();
+    if (!usuario) {
+        console.error(
+            'Login aceito pelo servidor, mas o cookie da sessão não voltou no /me. ' +
+            'Em desenvolvimento, abra o site por http://localhost:5500 (e não 127.0.0.1): ' +
+            'o cookie SameSite=Strict só vai para a API (localhost:8080) se o site também for localhost.'
+        );
+        alert('Não foi possível iniciar a sessão neste navegador. Tente novamente.');
+    }
+    return usuario;
+}
+
+// Chaves da época em que a sessão ficava no localStorage. Nada disso é usado mais;
+// apagamos para não deixar tokens antigos esquecidos no navegador.
 function limparSessao() {
     ['idUsuarioLogado', 'nome', 'emailUsuario', 'token', 'role', 'usuarioLogado']
         .forEach(chave => localStorage.removeItem(chave));
 }
 
-function fazerLogout() {
-    limparSessao();
-    window.location.href = 'index.html';
+// As páginas dentro de /pages precisam de "../" para chegar no index.html
+function caminhoRaiz() {
+    return window.location.pathname.includes('/pages/') ? '../' : './';
 }
 
-localStorage.removeItem('usuarioLogado');
+function irParaLogin() {
+    window.location.href = caminhoRaiz() + 'pages/login.html';
+}
+
+async function fazerLogout() {
+    try {
+        // Só o servidor consegue apagar um cookie HttpOnly
+        await fetch(`${API_USUARIOS}/logout`, { method: 'POST', credentials: 'include' });
+    } catch (erro) {
+        console.error('Não foi possível avisar o servidor do logout:', erro);
+    }
+    limparSessao();
+    window.location.href = caminhoRaiz() + 'index.html';
+}
+
+/**
+ * Para onde ir depois de logar/cadastrar.
+ * - Pelo carrinho (modal): segue para o checkout, como antes.
+ * - Pela página de login (menu): a página define data-pos-login no <body>.
+ */
+function destinoAposLogin() {
+    return document.body.dataset.posLogin || 'checkout.html';
+}
+
+// Troca o "Login" do menu por "Sair" quando o usuário já está logado
+async function atualizarMenuLogin() {
+    const linksLogin = document.querySelectorAll('.link-login');
+    if (linksLogin.length === 0 || !await estaLogado()) return;
+
+    linksLogin.forEach(link => {
+        link.textContent = 'Sair';
+        link.href = '#';
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            fazerLogout();
+        });
+    });
+}
+
+atualizarMenuLogin();
+
+// --- ALTERNAR ENTRE "ENTRAR" E "CRIAR CONTA" ---
+// Mostra só uma das caixas por vez. modo = 'login' ou 'cadastro'
+function mostrarAbaAuth(modo) {
+    document.querySelectorAll('.auth-container').forEach(container => {
+        container.classList.toggle('modo-cadastro', modo === 'cadastro');
+    });
+}
+
+document.querySelectorAll('[data-auth-ir]').forEach(link => {
+    link.addEventListener('click', (event) => {
+        event.preventDefault();
+        mostrarAbaAuth(link.dataset.authIr);
+    });
+});
+
+limparSessao();
 
 // ---CONECTANDO FORMULÁRIOS---
 

@@ -22,8 +22,8 @@
             <ul class="container_menu">
                 <li><a href="index.html">Início</a></li>
                 <li><a href="./pages/loja.html">Produtos</a></li>
-                <li><a href="#">Cardápio</a></li>
                 <li><a href="./pages/historia.html">Nossa História</a></li>
+                <li><a href="./pages/login.html" class="link-login">Login</a></li>
             </ul>
         </nav>
 
@@ -59,15 +59,23 @@
             <h2>Um pequeno gostinho da nossa loja</h2>
          </div>
 
-         <div class="carossel-janela">
-            <div class="carrossel-trilho" id="trilho">
-                <img src="./imgs/espaco_loja1.jpeg">
-                <img src="./imgs/img_loja01.jpeg">
-                <img src="./imgs/img_loja02.jpeg">
-                <img src="./imgs/img_loja03.jpeg">
-                <img src="./imgs/img_loja04.jpeg">
-                <img src="./imgs/img_loja05.jpeg">
+         <div class="carrossel" id="carrossel">
+            <button class="carrossel-seta carrossel-seta-esq" id="carrossel-anterior" aria-label="Foto anterior">&#10094;</button>
+
+            <div class="carrossel-janela">
+                <div class="carrossel-trilho" id="trilho">
+                    <img src="./imgs/espaco_loja1.jpeg" alt="Espaço da loja">
+                    <img src="./imgs/img_loja01.jpeg" alt="Foto da loja">
+                    <img src="./imgs/img_loja02.jpeg" alt="Foto da loja">
+                    <img src="./imgs/img_loja03.jpeg" alt="Foto da loja">
+                    <img src="./imgs/img_loja04.jpeg" alt="Foto da loja">
+                    <img src="./imgs/img_loja05.jpeg" alt="Foto da loja">
+                </div>
             </div>
+
+            <button class="carrossel-seta carrossel-seta-dir" id="carrossel-proximo" aria-label="Próxima foto">&#10095;</button>
+
+            <div class="carrossel-pontos" id="carrossel-pontos"></div>
          </div>
     </section>
 
@@ -103,6 +111,7 @@
     <p><a href="./pages/termos.html">Termos de uso</a> e <a href="./pages/privacidade.html">política de privacidade</a> - <a>Política de Cookies.</a></p>
 </footer>
 
+<script src="./js/auth.js"></script>
 <script src="./js/main.js"></script>
 <script src="./js/carrinho.js"></script>
 

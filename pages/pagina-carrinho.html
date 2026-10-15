@@ -22,8 +22,8 @@
             <ul class="container_menu">
                 <li><a href="../index.html">Início</a></li>
                 <li><a href="loja.html">Produtos</a></li>
-                <li><a href="#">Cardápio</a></li>
                 <li><a href="historia.html">Nossa História</a></li>
+                <li><a href="login.html" class="link-login">Login</a></li>
             </ul>
         </nav>
 
@@ -42,13 +42,14 @@
      </div>
         
     </header>
-    <main style="max-width: 800px; margin: 50px auto; padding: 20px;">
-          <h2 class="container_div_titulo_carrinho">Seu Carrinho</h2>
-        
-        <div id="lista-carrinho"></div>
-        <div style="text-align: right; margin-top: 20px;">
+    <main class="carrinho-pagina">
+        <h2 class="container_div_titulo_carrinho">Seu Carrinho</h2>
+
+        <div id="lista-carrinho" class="carrinho-lista"></div>
+
+        <div class="carrinho-rodape">
             <h3>Total: R$ <span id="preco-total">0,00</span></h3>
-            <button class="btn" onclick="avancarParaCheckout()">Continuar</button>
+            <button class="btn" id="btn-continuar" onclick="avancarParaCheckout()">Continuar</button>
         </div>
     </main>
 
@@ -57,8 +58,9 @@
         <button id="btn-fechar-modal" class="btn-fechar">X</button>
         
         <div class="auth-container">
-            <section class="auth-box">
-                <h2>Já tenho conta</h2>
+            <section class="auth-box auth-login">
+                <h2>Entrar</h2>
+                <p class="auth-subtitulo">Faça login para finalizar sua compra.</p>
                 <form id="form-login">
                     <div class="input-group">
                         <label for="email-login">E-mail</label>
@@ -72,11 +74,10 @@
                     </div>
                     <button type="submit" class="btn-submit">Entrar</button>
                 </form>
+                <p class="auth-alternar">Não tem conta? <a href="#" data-auth-ir="cadastro">Criar conta</a></p>
             </section>
 
-            <div class="divisor"></div>
-
-            <section class="auth-box">
+            <section class="auth-box auth-cadastro">
                 <h2>Criar nova conta</h2>
                 <form id="form-cadastro">
                     <div class="input-group">
@@ -111,6 +112,7 @@
                     </div>
                     <button type="submit" class="btn-submit">Cadastrar</button>
                 </form>
+                <p class="auth-alternar">Já tem conta? <a href="#" data-auth-ir="login">Entrar</a></p>
             </section>
         </div>
     </div>

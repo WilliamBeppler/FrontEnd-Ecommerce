@@ -13,7 +13,10 @@ function carregarResumoPedido() {
     if (!divListaItens || !h3ValorTotal) return;
 
     if (carrinho.length === 0) {
-        divListaItens.innerHTML = '<p style="color: #dc3545; font-weight: bold;">Seu carrinho está vazio.</p>';
+        const vazio = document.createElement('p');
+        vazio.style.cssText = 'color: #dc3545; font-weight: bold;';
+        vazio.textContent = 'Seu carrinho está vazio.';
+        divListaItens.replaceChildren(vazio);
         h3ValorTotal.innerText = 'R$ 0,00';
         if (btnFinalizar) {
             btnFinalizar.disabled = true;
@@ -23,34 +26,44 @@ function carregarResumoPedido() {
         return;
     }
 
-    let htmlItens = '';
     let valorTotalPedido = 0;
 
-    carrinho.forEach(item => {
+    // createElement + textContent: o nome do produto nunca é interpretado como HTML
+    const linhas = carrinho.map(item => {
         const quantidadeAtual = item.quantidade ? item.quantidade : 1;
 
         const subtotal = item.preco * quantidadeAtual;
         valorTotalPedido += subtotal;
 
-        htmlItens += `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
-                <span style="color: #555;"><strong>${quantidadeAtual}x</strong> ${item.nome}</span>
-                <span style="font-weight: bold;">R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
-            </div>
-        `;
+        const linha = document.createElement('div');
+        linha.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;';
+
+        const descricao = document.createElement('span');
+        descricao.style.color = '#555';
+        const qtd = document.createElement('strong');
+        qtd.textContent = `${quantidadeAtual}x`;
+        descricao.append(qtd, ` ${item.nome}`);
+
+        const valor = document.createElement('span');
+        valor.style.fontWeight = 'bold';
+        valor.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+
+        linha.append(descricao, valor);
+        return linha;
     });
 
-    divListaItens.innerHTML = htmlItens;
+    divListaItens.replaceChildren(...linhas);
     h3ValorTotal.innerText = `R$ ${valorTotalPedido.toFixed(2).replace('.', ',')}`;
 }
 
-// Já que o usuário está logado, adianta o que a gente sabe dele
-function preencherDadosDoUsuario() {
-    if (!estaLogado()) return;
+// Já que o usuário está logado, adianta o que a gente sabe dele (vem do /me, não do localStorage)
+async function preencherDadosDoUsuario() {
+    const usuario = await estaLogado();
+    if (!usuario) return;
 
     const campoNome = document.getElementById('nome');
     if (campoNome && !campoNome.value) {
-        campoNome.value = localStorage.getItem('nome') || '';
+        campoNome.value = usuario.nome || '';
     }
 }
 
@@ -77,7 +90,7 @@ if (btnFinalizar) {
     });
 }
 
-function finalizarPedido() {
+async function finalizarPedido() {
     const carrinho = JSON.parse(localStorage.getItem('meuCarrinho')) || [];
 
     if (carrinho.length === 0) {
@@ -91,8 +104,8 @@ function finalizarPedido() {
         return;
     }
 
-    // Mesma verificação usada no carrinho e gravada pelo auth.js
-    if (!estaLogado()) {
+    // Mesma verificação usada no carrinho: pergunta ao servidor (/me)
+    if (!await estaLogado()) {
         alert('Você precisa fazer login para finalizar a sua compra!');
 
         // CORREÇÃO: o modal é #modal-auth (id), e o código antigo procurava
@@ -102,53 +115,55 @@ function finalizarPedido() {
         if (modalLogin) {
             modalLogin.style.display = 'flex';
         } else {
-            window.location.href = 'login.html';
+            irParaLogin();
         }
         return;
     }
 
-    const usuarioLogadoId = parseInt(localStorage.getItem('idUsuarioLogado'), 10);
-
+    // Formato do PedidoRequest do Java: só o que o cliente pode escolher.
+    // Dono, preço, total e status NÃO vão no pacote: o servidor decide (dono vem do cookie).
     const pedidoPayload = {
-        usuario: { id: usuarioLogadoId },
-        clienteNome: document.getElementById('nome')?.value || 'Cliente Não Informado',
-        cpf: document.getElementById('cpf')?.value || '',
-
         endereco: {
             cep: document.getElementById('cep')?.value || '',
             rua: document.getElementById('rua')?.value || '',
             numero: document.getElementById('numero')?.value || '',
             bairro: document.getElementById('bairro')?.value || '',
             cidade: document.getElementById('cidade')?.value || '',
-            estado: document.getElementById('estado')?.value || 'SC',
-            usuario: { id: usuarioLogadoId }
+            estado: document.getElementById('estado')?.value || 'SC'
         },
 
         metodoPagamento: radioPagamento.value,
 
         itens: carrinho.map(item => ({
-            produto: { id: item.id },
-            quantidade: item.quantidade || 1,
-            precoUnitario: item.preco
+            produtoId: item.id,
+            quantidade: item.quantidade || 1
         }))
     };
 
     console.log("PACOTE QUE ESTÁ INDO PARA O JAVA:", pedidoPayload);
 
-    // Monta os headers incluindo o token, se o back-end estiver protegido
-    const headers = { 'Content-Type': 'application/json' };
-    const token = localStorage.getItem('token');
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-
     fetch('http://localhost:8080/api/pedidos', {
         method: 'POST',
-        headers: headers,
+        credentials: 'include', // o navegador anexa o cookie HttpOnly com o token
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pedidoPayload)
     })
         .then(response => {
-            // Distingue "não autorizado" de "deu ruim no servidor"
-            if (response.status === 401 || response.status === 403) {
+            // 401 = sem sessão válida (cookie ausente, token vencido): volta para o login
+            if (response.status === 401) {
                 throw new Error('SESSAO_EXPIRADA');
+            }
+            // 403 = logado, mas sem permissão para esta ação: não desloga ninguém
+            if (response.status === 403) {
+                throw new Error('SEM_PERMISSAO');
+            }
+            // 400 = o servidor recusou o pedido e explicou por quê (ex.: produto desativado)
+            if (response.status === 400) {
+                return response.text().then(mensagem => {
+                    const erro = new Error('PEDIDO_RECUSADO');
+                    erro.mensagemServidor = mensagem;
+                    throw erro;
+                });
             }
             if (!response.ok) {
                 throw new Error('Falha ao processar o pedido no servidor.');
@@ -165,7 +180,18 @@ function finalizarPedido() {
 
             if (erro.message === 'SESSAO_EXPIRADA') {
                 alert('Sua sessão expirou. Faça login novamente.');
-                fazerLogout();
+                limparSessao();
+                irParaLogin(); // o carrinho continua salvo no navegador
+                return;
+            }
+
+            if (erro.message === 'SEM_PERMISSAO') {
+                alert('Sua conta não tem permissão para esta ação.');
+                return;
+            }
+
+            if (erro.message === 'PEDIDO_RECUSADO') {
+                alert(erro.mensagemServidor); // alert mostra texto puro; não interpreta HTML
                 return;
             }
 
